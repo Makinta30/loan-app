@@ -1,0 +1,15 @@
+<%- include('partials/header') %>
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-xl font-semibold mb-4">Forgot password</h2>
+  <% if (typeof message !== 'undefined') { %>
+    <div class="text-green-600 mb-3"><%= message %></div>
+  <% } %>
+  <form method="post" action="/forgot" class="space-y-3">
+    <input name="email" placeholder="Enter your email" class="w-full p-2 border rounded" />
+    <div>
+      <button class="px-4 py-2 bg-green-600 text-white rounded">Request reset</button>
+      <a href="/login" class="ml-4 text-sm text-gray-600">Back to login</a>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

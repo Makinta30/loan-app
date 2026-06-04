@@ -1,0 +1,15 @@
+<%- include('partials/header') %>
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-lg font-semibold">BVN Verification</h2>
+  <% if (typeof error !== 'undefined') { %>
+    <div class="text-red-600 mt-3"><%= error %></div>
+  <% } %>
+  <form method="post" action="/verify-bvn" class="mt-4 space-y-3">
+    <input name="bvn" placeholder="Enter 11-digit BVN" class="w-full p-2 border rounded" />
+    <div>
+      <button class="px-4 py-2 bg-yellow-500 text-white rounded">Verify</button>
+      <a href="/dashboard" class="ml-4 text-sm text-gray-600">Cancel</a>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,128 @@
+<%- include('partials/header') %>
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-lg font-semibold">Deposit payment</h2>
+  <p class="mt-3">Loan amount: <strong>₦<%= amount.toLocaleString() %></strong></p>
+  <p>Required deposit: <strong>₦<%= deposit.toLocaleString() %></strong></p>
+  <p class="text-sm text-gray-600 mt-2">You will pay via Paystack. After successful payment you'll complete the loan form.</p>
+  <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg mt-4 mb-4">
+    <p class="text-sm text-blue-700">✅ After payment, you will receive an alert and be guided to the loan disbursement form.</p>
+  </div>
+  <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+    <button id="paynow" class="px-4 py-2 bg-blue-600 text-white rounded">Pay with Paystack</button>
+    <button id="viewFormBtn" type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded border border-gray-300 hover:bg-gray-300 transition">View application form</button>
+    <a href="/apply" class="text-sm text-gray-600 hover:text-gray-800">Cancel</a>
+  </div>
+
+  <div id="formPreview" class="hidden mt-6 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+    <div class="mb-4 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4">
+      <p class="text-sm text-gray-700"><strong>Form preview only:</strong> This form is read-only until your payment is confirmed.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+        <input disabled value="Your first name" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+        <input disabled value="Your last name" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Date of Birth</label>
+        <input disabled value="YYYY-MM-DD" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">State of Origin</label>
+        <input disabled value="Your state" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">LGA of Origin</label>
+        <input disabled value="Your local government" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Bank Account Name</label>
+        <input disabled value="Account holder name" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Bank Account Number</label>
+        <input disabled value="1234567890" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Upload Passport / ID</label>
+        <div class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">Passport or ID upload will be enabled after payment.</div>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Reason for Loan</label>
+        <textarea disabled class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" rows="4">Explain why you need the loan and how it will grow your business.</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmationModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4 py-8">
+    <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl">
+      <h3 class="text-xl font-bold mb-3">Payment Submitted</h3>
+      <p id="confirmationMessage" class="text-gray-700 mb-4">We are verifying your payment and will redirect you shortly.</p>
+      <div class="flex justify-end">
+        <button id="closeModal" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script>
+    const paystackKey = '<%= paystackKey %>';
+    const loanId = '<%= loanId %>';
+    const deposit = <%= deposit %>;
+    const email = '<%= email %>';
+    const modal = document.getElementById('confirmationModal');
+    const closeModal = document.getElementById('closeModal');
+    const messageEl = document.getElementById('confirmationMessage');
+
+    function showModal(title, message) {
+      messageEl.innerHTML = `<strong>${title}</strong><br/>${message}`;
+      modal.classList.remove('hidden');
+    }
+
+    closeModal.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    document.getElementById('viewFormBtn').addEventListener('click', () => {
+      document.getElementById('formPreview').classList.toggle('hidden');
+    });
+
+    document.getElementById('paynow').addEventListener('click', () => {
+      if (!paystackKey || paystackKey === 'PAYSTACK_PUBLIC_KEY') return alert('Paystack public key not configured. See README.');
+      if (!window.PaystackPop) return alert('Paystack script not loaded yet. Refresh the page if needed.');
+      const handler = PaystackPop.setup({
+        key: paystackKey,
+        email,
+        amount: deposit * 100,
+        currency: 'NGN',
+        ref: 'loanref_' + Math.floor(Math.random()*1000000000),
+        metadata: { loanId: loanId },
+        onClose: function(){
+          showModal('Payment interrupted', 'You closed the payment window. Please try again if the payment was not completed.');
+        },
+        callback: function(response){
+          showModal('Payment successful', 'Your payment has been processed. Verifying now...');
+          fetch('/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reference: response.reference, loanId })
+          }).then(r=>r.json()).then(j=>{
+            if (j.ok) {
+              showModal('Verified successfully', 'Your deposit is complete. Redirecting to the loan form now...');
+              setTimeout(() => window.location = j.redirect, 2200);
+            } else {
+              showModal('Verification failed', 'Payment could not be verified yet. You will receive an alert if it succeeds.');
+            }
+          }).catch(() => {
+            showModal('Verification failed', 'There was a network error verifying your payment. Please try again or contact support.');
+          });
+        }
+      });
+      handler.openIframe();
+    });
+  </script>
+</div>
+<%- include('partials/footer') %>

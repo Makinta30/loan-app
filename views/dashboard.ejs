@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+
+<!-- Welcome Section -->
+<div class="bg-gradient-to-r from-green-500 to-blue-500 text-white p-8 rounded-lg shadow-lg mb-6">
+  <h2 class="text-3xl font-bold mb-2">Welcome, <%= user.name || user.email %>! 👋</h2>
+  <p class="text-lg">We're excited to help you grow your business or agricultural venture with our quick and easy loan process.</p>
+</div>
+
+<!-- Loan Info Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+  <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+    <h3 class="text-xl font-bold text-green-700 mb-3">💰 Quick Loan Process</h3>
+    <ul class="space-y-2 text-sm text-gray-700">
+      <li>✅ Verify BVN (11 digits)</li>
+      <li>✅ Choose loan amount</li>
+      <li>✅ Make small deposit payment</li>
+      <li>✅ Fill application form</li>
+      <li>✅ Get approval notification</li>
+    </ul>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+    <h3 class="text-xl font-bold text-blue-700 mb-3">📊 Deposit Percentages</h3>
+    <ul class="space-y-2 text-sm text-gray-700">
+      <li>🔹 Up to ₦50,000 → 5% deposit required</li>
+      <li>🔹 ₦50k - ₦200k → 10% deposit required</li>
+      <li>🔹 Above ₦200k → 15% deposit required</li>
+      <li class="mt-3 font-semibold text-gray-900">Example: Borrow ₦100k = Pay ₦10k deposit</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Loan Categories Preview -->
+<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+  <h3 class="text-xl font-bold text-gray-800 mb-4">💳 Available Loan Amounts</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="bg-green-100 p-3 rounded text-center">
+      <p class="font-bold text-green-700">₦20,000</p>
+      <p class="text-xs text-gray-600">Deposit: ₦1,000</p>
+    </div>
+    <div class="bg-green-100 p-3 rounded text-center">
+      <p class="font-bold text-green-700">₦30,000</p>
+      <p class="text-xs text-gray-600">Deposit: ₦1,500</p>
+    </div>
+    <div class="bg-blue-100 p-3 rounded text-center">
+      <p class="font-bold text-blue-700">₦100,000</p>
+      <p class="text-xs text-gray-600">Deposit: ₦10,000</p>
+    </div>
+    <div class="bg-blue-100 p-3 rounded text-center">
+      <p class="font-bold text-blue-700">₦250,000</p>
+      <p class="text-xs text-gray-600">Deposit: ₦25,000</p>
+    </div>
+    <div class="bg-purple-100 p-3 rounded text-center">
+      <p class="font-bold text-purple-700">₦500,000</p>
+      <p class="text-xs text-gray-600">Deposit: ₦75,000</p>
+    </div>
+    <div class="bg-purple-100 p-3 rounded text-center">
+      <p class="font-bold text-purple-700">₦1,000,000</p>
+      <p class="text-xs text-gray-600">Deposit: ₦150,000</p>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Note -->
+<div class="bg-blue-50 p-6 rounded-lg shadow-md mb-6 border border-blue-100">
+  <h3 class="text-lg font-semibold text-blue-800 mb-2">📩 Payment Alerts & Approval Notices</h3>
+  <p class="text-sm text-blue-700">After you make your deposit payment, our system will send an alert to your registered email. Once your loan form is completed, you will receive confirmation for disbursement and next steps.</p>
+</div>
+
+<!-- Action Section -->
+<div class="bg-white p-6 rounded-lg shadow-md">
+  <% if (!user.bvn_verified) { %>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+      <h3 class="text-lg font-semibold text-yellow-800 mb-2">⚠️ BVN Verification Required</h3>
+      <p class="text-sm text-yellow-700">To protect your account and comply with regulations, we need to verify your BVN (11-digit Bank Verification Number).</p>
+    </div>
+    <a href="/verify-bvn" class="inline-block px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition">Verify BVN Now</a>
+  <% } else { %>
+    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
+      <h3 class="text-lg font-semibold text-green-800 mb-2">✅ Your BVN is Verified</h3>
+      <p class="text-sm text-green-700">You're all set! Click below to start your loan application today.</p>
+    </div>
+    <a href="/apply" class="inline-block px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition">Apply for Loan Now</a>
+  <% } %>
+  <div class="mt-6">
+    <a href="/logout" class="text-sm text-gray-500 hover:text-gray-800 transition">← Logout</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
