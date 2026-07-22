@@ -12,6 +12,27 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Log a small, non-sensitive summary of environment on startup to aid remote debugging
+const envSummary = {
+  PORT: process.env.PORT || '3000',
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  PAYSTACK_PUBLIC_KEY: process.env.PAYSTACK_PUBLIC_KEY ? 'set' : 'unset',
+  PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY ? 'set' : 'unset',
+  EMAIL_USER: process.env.EMAIL_USER ? 'set' : 'unset'
+};
+console.log('Env summary:', envSummary);
+
+// Global handlers to log unexpected errors and exit with non-zero code so Render shows failure details
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
+  process.exit(1);
+});
+
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
 const fs = require('fs');
