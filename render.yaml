@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: loan-app
+    name: loanbus
     env: node
     region: oregon
     plan: free
