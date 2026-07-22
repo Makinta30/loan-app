@@ -4,9 +4,9 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install --include=dev
-    startCommand: node server.js
-    healthCheckPath: /login
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
     envVars:
       - key: PORT
         value: 10000

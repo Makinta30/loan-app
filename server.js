@@ -12,9 +12,16 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+const fs = require('fs');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Multer setup for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
+  destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => cb(null, Date.now() + '_' + file.originalname)
 });
 const upload = multer({ storage });
@@ -29,7 +36,16 @@ const emailer = nodemailer.createTransport({
 });
 
 const DB_FILE = path.join(__dirname, 'data.db');
-const db = new sqlite3.Database(DB_FILE);
+const db = new sqlite3.Database(DB_FILE, (err) => {
+  if (err) {
+    console.error('Database connection error:', err);
+  }
+});
+
+// Better error handling for database operations
+db.on('error', (err) => {
+  console.error('Database error:', err);
+});
 
 // Create tables
 db.serialize(() => {
@@ -40,7 +56,11 @@ db.serialize(() => {
     password_hash TEXT,
     bvn TEXT,
     bvn_verified INTEGER DEFAULT 0
-  )`);
+  )`, (err) => {
+    if (err && !err.message.includes('already exists')) {
+      console.error('Error creating users table:', err);
+    }
+  });
 
   db.run(`CREATE TABLE IF NOT EXISTS loans (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +70,11 @@ db.serialize(() => {
     status TEXT DEFAULT 'pending',
     details TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+  )`, (err) => {
+    if (err && !err.message.includes('already exists')) {
+      console.error('Error creating loans table:', err);
+    }
+  });
 
   db.run(`CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +83,11 @@ db.serialize(() => {
     amount INTEGER,
     status TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+  )`, (err) => {
+    if (err && !err.message.includes('already exists')) {
+      console.error('Error creating payments table:', err);
+    }
+  });
 });
 
 app.set('view engine', 'ejs');
@@ -291,4 +319,11 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 });
 
-app.listen(PORT, () => console.log(`Loan app running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Loan app running on port ${PORT}`);
+  console.log(`Loan app running on http://0.0.0.0:${PORT}`);
+}).on('error', (err) => {
+  console.error('Server error:', err);
+  process.exit(1);
+});
+
