@@ -2,9 +2,11 @@ services:
   - type: web
     name: loan-app
     env: node
+    region: oregon
     plan: free
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /login
     envVars:
       - key: PORT
         value: 10000
