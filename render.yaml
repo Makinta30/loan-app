@@ -4,12 +4,14 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: npm install --include=dev
+    startCommand: node server.js
     healthCheckPath: /login
     envVars:
       - key: PORT
         value: 10000
+      - key: NODE_ENV
+        value: production
       - key: SESSION_SECRET
         generateValue: true
       - key: PAYSTACK_PUBLIC_KEY
