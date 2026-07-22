@@ -56,7 +56,9 @@ const emailer = nodemailer.createTransport({
   }
 });
 
-const DB_FILE = path.join(__dirname, 'data.db');
+const useInMemory = process.env.USE_IN_MEMORY_DB === 'true';
+const DB_FILE = useInMemory ? ':memory:' : path.join(__dirname, 'data.db');
+console.log('Using SQLite DB:', useInMemory ? 'in-memory' : DB_FILE);
 const db = new sqlite3.Database(DB_FILE, (err) => {
   if (err) {
     console.error('Database connection error:', err);

@@ -24,3 +24,5 @@ services:
         sync: false
       - key: EMAIL_PASS
         sync: false
+      - key: USE_IN_MEMORY_DB
+        value: "true"
