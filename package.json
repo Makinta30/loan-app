@@ -9,6 +9,23 @@
   "scripts": {
     "start": "node server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Makinta30/loan-app.git"
+  },
+  "author": "Makinta30",
+  "license": "MIT",
+  "keywords": [
+    "loan",
+    "loan-app",
+    "paystack",
+    "express"
+  ],
+  "files": [
+    "server.js",
+    "views",
+    "public"
+  ],
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^16.1.4",
