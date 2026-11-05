@@ -1,30 +1,31 @@
-# Farmers Alliance & Business Boost Loan (Demo)
+# HarvestBridge — Finance Product Preview
 
-This is a minimal demo loan application with:
-- Signup, login and forgotten password templates (EJS)
-- Dashboard prompting BVN verification
-- Loan categories and deposit calculation by tier
-- Paystack inline payment for deposit
-- Simple SQLite storage for users, loans and payments
+HarvestBridge is the working name for an early product preview exploring a financing experience for farmers and small businesses. This repository is not an active lending service.
 
-Setup
+## Current public preview
 
-1. Copy `.env.example` to `.env` and fill `PAYSTACK_PUBLIC_KEY` and `PAYSTACK_SECRET_KEY`.
-2. Install dependencies:
+The public site presents the concept only. In preview mode, all non-GET requests and account, identity, loan, and payment pages are blocked before form submissions are processed. Do not enter real personal, BVN, banking, identity, or payment information.
+
+The available pages do not issue loan offers, verify identity, approve applications, or disburse funds. Displayed product language is conceptual, not a financial offer.
+
+## Run locally
+
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Run the app:
+2. Start the app:
 
 ```bash
 npm start
 ```
 
-Open http://localhost:3000
+3. Open http://localhost:3000
 
-Notes
-- BVN verification is simulated (checks 11 digits).
-- Payment verification calls Paystack verify endpoint — use test keys for sandbox.
-- This is a demo starter; secure and production-hardening steps are required before real usage.
+The site remains in preview mode locally and on Vercel.
+
+## Work required before any real lending launch
+
+A real service needs verified business identity and authorization, published loan terms and pricing, an appropriate persistent database and document storage, a real identity-verification provider, production payment configuration and reconciliation, account recovery and support processes, and reviewed privacy and customer disclosures. These choices depend on the actual business and operating country.
