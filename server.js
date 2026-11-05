@@ -34,7 +34,7 @@ process.on('unhandledRejection', (reason) => {
 });
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, 'uploads');
+const uploadsDir = process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads');
 const fs = require('fs');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -57,7 +57,7 @@ const emailer = nodemailer.createTransport({
 });
 
 const useInMemory = process.env.USE_IN_MEMORY_DB === 'true';
-const DB_FILE = useInMemory ? ':memory:' : path.join(__dirname, 'data.db');
+const DB_FILE = useInMemory ? ':memory:' : (process.env.VERCEL ? path.join('/tmp', 'data.db') : path.join(__dirname, 'data.db'));
 console.log('Using SQLite DB:', useInMemory ? 'in-memory' : DB_FILE);
 const db = new sqlite3.Database(DB_FILE, (err) => {
   if (err) {
@@ -118,7 +118,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 
 app.use(session({
