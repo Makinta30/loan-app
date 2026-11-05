@@ -122,7 +122,7 @@ app.set('views', path.join(__dirname, 'views'));
 // In preview mode, reject write requests before parsing or storing submitted form data.
 app.use((req, res, next) => {
   if (!PREVIEW_MODE) return next();
-  const unavailablePaths = ['/dashboard', '/verify-bvn', '/apply', '/forgot', '/login', '/signup'];
+  const unavailablePaths = ['/verify-bvn', '/apply', '/forgot'];
   if (req.method !== 'GET' || unavailablePaths.includes(req.path) || req.path.startsWith('/loan-form/')) {
     return res.status(503).render('preview_unavailable');
   }
@@ -161,7 +161,7 @@ app.get('/', (req, res) => {
   res.redirect('/login');
 });
 
-app.get('/signup', (req, res) => PREVIEW_MODE ? res.redirect('/') : res.render('signup'));
+app.get('/signup', (req, res) => res.render('signup'));
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
   if (!email || !password) return res.render('signup', { error: 'Email and password required' });
@@ -173,7 +173,7 @@ app.post('/signup', async (req, res) => {
   });
 });
 
-app.get('/login', (req, res) => PREVIEW_MODE ? res.redirect('/') : res.render('login'));
+app.get('/login', (req, res) => res.render('login'));
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
   db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
@@ -195,9 +195,14 @@ app.post('/forgot', (req, res) => {
   });
 });
 
-app.get('/dashboard', requireAuth, (req, res) => {
+app.get('/dashboard', (req, res) => {
+  if (PREVIEW_MODE) return res.render('dashboard');
+  if (!req.user) return res.redirect('/login');
   res.render('dashboard', { user: req.user });
 });
+
+app.get('/admin/login', (req, res) => res.render('admin_login'));
+app.get('/admin', (req, res) => res.render('admin_dashboard'));
 
 app.get('/verify-bvn', requireAuth, (req, res) => {
   if (req.user.bvn_verified) return res.redirect('/apply');
