@@ -12,6 +12,9 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Keep public interactions disabled until real lender, verification, payment, and data services are in place.
+const PREVIEW_MODE = true;
+
 // Log a small, non-sensitive summary of environment on startup to aid remote debugging
 const envSummary = {
   PORT: process.env.PORT || '3000',
@@ -115,6 +118,16 @@ db.serialize(() => {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// In preview mode, reject write requests before parsing or storing submitted form data.
+app.use((req, res, next) => {
+  if (!PREVIEW_MODE) return next();
+  const unavailablePaths = ['/dashboard', '/verify-bvn', '/apply', '/forgot', '/login', '/signup'];
+  if (req.method !== 'GET' || unavailablePaths.includes(req.path) || req.path.startsWith('/loan-form/')) {
+    return res.status(503).render('preview_unavailable');
+  }
+  next();
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
@@ -143,11 +156,12 @@ function requireAuth(req, res, next) {
 }
 
 app.get('/', (req, res) => {
+  if (PREVIEW_MODE) return res.render('home');
   if (req.user) return res.redirect('/dashboard');
   res.redirect('/login');
 });
 
-app.get('/signup', (req, res) => res.render('signup'));
+app.get('/signup', (req, res) => PREVIEW_MODE ? res.redirect('/') : res.render('signup'));
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
   if (!email || !password) return res.render('signup', { error: 'Email and password required' });
@@ -159,7 +173,7 @@ app.post('/signup', async (req, res) => {
   });
 });
 
-app.get('/login', (req, res) => res.render('login'));
+app.get('/login', (req, res) => PREVIEW_MODE ? res.redirect('/') : res.render('login'));
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
   db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
@@ -171,7 +185,7 @@ app.post('/login', (req, res) => {
   });
 });
 
-app.get('/forgot', (req, res) => res.render('forgot'));
+app.get('/forgot', (req, res) => PREVIEW_MODE ? res.redirect('/') : res.render('forgot'));
 app.post('/forgot', (req, res) => {
   const { email } = req.body;
   // Simple: generate token and show link (in production send email)
